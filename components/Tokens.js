@@ -8,15 +8,40 @@ import Animated, {
   withRepeat,
   Easing
 } from 'react-native-reanimated';
-import Svg, { Path, Circle } from 'react-native-svg';
 import { COLORS, GLOBAL_PATH, HOME_PATHS, YARD_POSITIONS, BASE_OFFSETS, CELL_SIZE } from '../constants';
-import PiecesSvg from '../assets/Pieces.svg';
+import AirSvg from '../assets/air.svg';
+import WaterSvg from '../assets/water.svg';
+import FireSvg from '../assets/fire.svg';
+import EarthSvg from '../assets/earth.svg';
 
-const PIECE_VIEWBOXES = {
-  RED: "10 135 600 600",
-  GREEN: "500 135 600 600",
-  YELLOW: "1000 135 600 600",
-  BLUE: "1572 135 600 600"
+const SHINY_THEMES = {
+  RED: {
+    color: '#FF4D4D',       // Lighter, luminous ruby
+    topGleam: '#FFA3A3',    // Specular top highlight
+  },
+  GREEN: {
+    color: '#34D399',       // Lighter, radiant emerald
+    topGleam: '#A7F3D0',    // Specular top highlight
+  },
+  YELLOW: {
+    color: '#FBBF24',       // Lighter, sparkling gold
+    topGleam: '#FDE68A',    // Specular top highlight
+  },
+  BLUE: {
+    color: '#38BDF8',       // Lighter, brilliant electric sky-blue
+    topGleam: '#BAE6FD',    // Specular top highlight
+  }
+};
+
+const getTokenSymbol = (player, color) => {
+  const size = "100%";
+  switch (player) {
+    case 'RED': return <FireSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
+    case 'BLUE': return <WaterSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
+    case 'GREEN': return <EarthSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
+    case 'YELLOW': return <AirSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
+    default: return null;
+  }
 };
 
 const CELL_PCT = 100 / 15; // 6.666%
@@ -61,17 +86,14 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
 
   useEffect(() => {
     if (prevPosition.current !== piece.relativePosition) {
-      // Need to animate
       const oldPos = prevPosition.current;
       const newPos = piece.relativePosition;
 
       if (newPos === -1) {
-        // Sent back to yard (captured)
         const target = getTileCoords(piece.player, -1, pieceIndex);
         left.value = withTiming(target.col * CELL_PCT, { duration: 400 });
         top.value = withTiming(target.row * CELL_PCT, { duration: 400 });
       } else {
-        // Sequential hopping
         let steps = [];
         let start = oldPos === -1 ? 0 : oldPos + 1;
 
@@ -87,7 +109,6 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
           for (let i = 0; i < steps.length; i++) {
             left.value = withTiming(steps[i].left, { duration: 150 });
             top.value = withTiming(steps[i].top, { duration: 150 });
-            // Add a small hop bounce
             scale.value = withSequence(
               withTiming(1.3, { duration: 75 }),
               withTiming(1, { duration: 75 })
@@ -114,6 +135,8 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
     };
   });
 
+  const theme = SHINY_THEMES[piece.player] || { color: COLORS[piece.player], topGleam: '#FFFFFF' };
+
   return (
     <Animated.View style={[styles.tokenContainer, animatedStyle]}>
       <TouchableOpacity
@@ -122,13 +145,19 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
         onPress={() => onPress(piece.id)}
         style={styles.tokenTouchable}
       >
-        <View style={styles.tokenSvgWrapper}>
-          <PiecesSvg
-            width="100%"
-            height="100%"
-            viewBox={PIECE_VIEWBOXES[piece.player]}
-            preserveAspectRatio="xMidYMid meet"
-          />
+        {eligible && <View style={styles.glowRing} />}
+        <View style={[
+          styles.tokenDisc,
+          {
+            borderColor: theme.color,
+            borderTopColor: theme.topGleam,
+            borderLeftColor: theme.topGleam,
+            shadowColor: theme.color,
+          }
+        ]}>
+          <View style={styles.symbolContainer}>
+            {getTokenSymbol(piece.player, theme.color)}
+          </View>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -136,12 +165,10 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
 };
 
 const Tokens = ({ pieces, eligiblePieces, onPiecePress }) => {
-  // Calculate stacking
-  // Group pieces by their exact col/row to apply micro offsets
   const tileGroups = {};
 
   pieces.forEach(piece => {
-    if (piece.relativePosition === -1 || piece.relativePosition === 56) return; // Don't stack in yard or home
+    if (piece.relativePosition === -1 || piece.relativePosition === 56) return;
     const pieceIndex = parseInt(piece.id.split('_')[1]);
     const { col, row } = getTileCoords(piece.player, piece.relativePosition, pieceIndex);
     const key = `${col},${row}`;
@@ -163,13 +190,11 @@ const Tokens = ({ pieces, eligiblePieces, onPiecePress }) => {
 
           if (group && group.length > 1) {
             const index = group.indexOf(piece.id);
-            // 2x2 grid offset
-            const offsetAmt = 4; // px
+            const offsetAmt = 4;
             if (index === 0) stackOffset = { dx: -offsetAmt, dy: -offsetAmt };
             if (index === 1) stackOffset = { dx: offsetAmt, dy: -offsetAmt };
             if (index === 2) stackOffset = { dx: -offsetAmt, dy: offsetAmt };
             if (index === 3) stackOffset = { dx: offsetAmt, dy: offsetAmt };
-            // Scale them down a bit if stacked, could be handled in token but transform is cleaner
           }
         }
 
@@ -201,15 +226,40 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 8,
   },
-  tokenSvgWrapper: {
-    width: '100%',
-    height: '100%',
+  glowRing: {
+    position: 'absolute',
+    width: '116%',
+    aspectRatio: 1,
+    borderRadius: 9999,
+    backgroundColor: 'rgba(34, 197, 94, 0.35)',
+    borderWidth: 2.5,
+    borderColor: '#22C55E',
+    shadowColor: '#22C55E',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  tokenDisc: {
+    width: '94%',
+    aspectRatio: 1,
+    borderRadius: 9999,
+    backgroundColor: '#F8F9FA', // Clean off-white surface
+    borderWidth: 2.8, // Crisp shiny outline
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  symbolContainer: {
+    width: '78%',
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   }
 });
 

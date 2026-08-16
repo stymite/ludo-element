@@ -7,11 +7,11 @@ import Tokens from './components/Tokens';
 import Dice from './components/Dice';
 import { WinnerModal, MenuModal } from './components/Modals';
 import { Image } from 'react-native';
-import HomeScreenSvg from './assets/Home_Screen.svg';
 import { getBestBotMove } from './botEngine';
+import HomeMenu from './components/HomeMenu';
 
 export default function App() {
-  const [appState, setAppState] = useState('SPLASH'); // 'SPLASH', 'HOME', 'GAME'
+  const [appState, setAppState] = useState('HOME'); // 'SPLASH', 'HOME', 'GAME'
   const [gameMode, setGameMode] = useState('PASS_N_PLAY'); // 'PASS_N_PLAY', 'VS_COMPUTER'
   const [gameState, setGameState] = useState(() => createGame(4));
   const [eligiblePieces, setEligiblePieces] = useState([]);
@@ -121,46 +121,18 @@ export default function App() {
 
   if (appState === 'HOME') {
     return (
-      <View style={{ flex: 1, backgroundColor: '#07070E' }}>
-        <StatusBar style="light" />
-        <View style={StyleSheet.absoluteFill}>
-          <HomeScreenSvg width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
-        </View>
-        <SafeAreaView style={{ flex: 1 }}>
-          <View style={{ flex: 0.4 }} />
-          <View style={{ flex: 0.5, paddingHorizontal: 40 }}>
-            {/* Play Online Button */}
-            <TouchableOpacity 
-              style={{ flex: 1, marginBottom: 10 }} 
-              onPress={() => alert('Play Online - Coming Soon')} 
-            />
-            {/* Play vs Computer Button */}
-            <TouchableOpacity 
-              style={{ flex: 1, marginBottom: 10 }} 
-              onPress={() => {
-                setGameMode('VS_COMPUTER');
-                setGameState(createGame(4, ['GREEN', 'YELLOW', 'BLUE']));
-                setAppState('GAME');
-              }} 
-            />
-            {/* Pass N Play Button */}
-            <TouchableOpacity 
-              style={{ flex: 1, marginBottom: 10 }} 
-              onPress={() => {
-                setGameMode('PASS_N_PLAY');
-                setGameState(createGame(4));
-                setAppState('GAME');
-              }} 
-            />
-            {/* Play with Friends Button */}
-            <TouchableOpacity 
-              style={{ flex: 1, marginBottom: 10 }} 
-              onPress={() => alert('Play with Friends - Coming Soon')} 
-            />
-          </View>
-          <View style={{ flex: 0.1 }} />
-        </SafeAreaView>
-      </View>
+      <HomeMenu
+        onPassNPlay={() => {
+          setGameMode('PASS_N_PLAY');
+          setGameState(createGame(4));
+          setAppState('GAME');
+        }}
+        onPlayComputer={() => {
+          setGameMode('VS_COMPUTER');
+          setGameState(createGame(4, ['GREEN', 'YELLOW', 'BLUE']));
+          setAppState('GAME');
+        }}
+      />
     );
   }
 

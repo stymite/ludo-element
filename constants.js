@@ -3,8 +3,8 @@ export const BOARD_SIZE = CELL_SIZE * 15; // 600
 
 export const COLORS = {
   RED: '#E53935',
-  GREEN: '#43A047',
-  YELLOW: '#FDD835',
+  GREEN: '#2E7D32',
+  YELLOW: '#F59E0B',
   BLUE: '#1E88E5',
   BOARD_BG: '#FFFFFF',
   PATH_BG: '#F5F5F5',
@@ -77,7 +77,6 @@ export const getPixelCoordinates = (player, relativePosition) => {
     [col, row] = HOME_PATHS[player][relativePosition - 51];
   } else if (relativePosition === 56) {
     // Center Destination (approximate depending on player)
-    // We can offset them slightly in the center so they don't overlap entirely
     if (player === 'RED') return [6.5 * CELL_SIZE, 7 * CELL_SIZE];
     if (player === 'GREEN') return [7 * CELL_SIZE, 6.5 * CELL_SIZE];
     if (player === 'YELLOW') return [7.5 * CELL_SIZE, 7 * CELL_SIZE];
