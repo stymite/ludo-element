@@ -113,7 +113,7 @@ const CoinMedallion = ({ player }) => {
 
   return (
     <View style={styles.coinWrapper}>
-      <Svg width="100%" height="100%" viewBox="0 0 100 100">
+      <Svg width="100%" height="100%" viewBox="0 0 100 100" style={StyleSheet.absoluteFill}>
         <Defs>
           {/* Metallic Rim Gradient */}
           <LinearGradient id={rimGradId} x1="0" y1="0" x2="0" y2="1">
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   glowRing: {
     position: 'absolute',
     width: '118%',
-    aspectRatio: 1,
+    height: '118%',
     borderRadius: 9999,
     borderWidth: 3,
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   coinWrapper: {
     width: '94%',
-    aspectRatio: 1,
+    height: '94%',
     borderRadius: 9999,
     justifyContent: 'center',
     alignItems: 'center',
