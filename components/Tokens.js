@@ -159,7 +159,7 @@ const CoinMedallion = ({ player }) => {
   );
 };
 
-const Token = ({ piece, eligible, onPress, stackOffset }) => {
+const Token = ({ piece, eligible, onPress, stackOffset, boardSize }) => {
   const pieceIndex = parseInt(piece.id.split('_')[1]);
   const currentCoords = getTileCoords(piece.player, piece.relativePosition, pieceIndex);
 
@@ -220,15 +220,22 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
   }, [piece.relativePosition]);
 
   const animatedStyle = useAnimatedStyle(() => {
+    const transform = [];
+    const scaleVal = scale.value * pulse.value;
+    if (scaleVal !== 1) {
+      transform.push({ scale: scaleVal });
+    }
+    if (stackOffset.dx !== 0) {
+      transform.push({ translateX: stackOffset.dx });
+    }
+    if (stackOffset.dy !== 0) {
+      transform.push({ translateY: stackOffset.dy });
+    }
+
     return {
-      left: `${left.value}%`,
-      top: `${top.value}%`,
-      transform: [
-        { scale: scale.value },
-        { scale: pulse.value },
-        { translateX: stackOffset.dx },
-        { translateY: stackOffset.dy }
-      ]
+      left: (left.value / 100) * boardSize,
+      top: (top.value / 100) * boardSize,
+      transform: transform.length > 0 ? transform : undefined
     };
   });
 
@@ -259,7 +266,7 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
   );
 };
 
-const Tokens = ({ pieces, eligiblePieces, onPiecePress }) => {
+const Tokens = ({ pieces, eligiblePieces, onPiecePress, boardSize }) => {
   const tileGroups = {};
 
   pieces.forEach(piece => {
@@ -300,6 +307,7 @@ const Tokens = ({ pieces, eligiblePieces, onPiecePress }) => {
             eligible={isEligible}
             onPress={onPiecePress}
             stackOffset={stackOffset}
+            boardSize={boardSize}
           />
         );
       })}
@@ -327,6 +335,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '118%',
     height: '118%',
+    left: '-9%',
+    top: '-9%',
     borderRadius: 9999,
     borderWidth: 3,
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
@@ -336,8 +346,11 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   coinWrapper: {
+    position: 'absolute',
     width: '94%',
     height: '94%',
+    left: '3%',
+    top: '3%',
     borderRadius: 9999,
     justifyContent: 'center',
     alignItems: 'center',

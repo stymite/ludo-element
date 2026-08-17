@@ -170,6 +170,7 @@ export default function App() {
               gameState.players[gameState.activePlayer]?.isBot ? [] : eligiblePieces
             }
             onPiecePress={handlePiecePress} 
+            boardSize={boardSize}
           />
         </View>
 
