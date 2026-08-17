@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, StyleSheet, Text } from 'react-native';
-import { GLOBAL_PATH, HOME_PATHS, YARD_POSITIONS, getCellRect } from '../constants';
+import { GLOBAL_PATH, HOME_PATHS, YARD_POSITIONS, YARD_PIXEL_POSITIONS, getCellRect } from '../constants';
 
 const LudoBoard = () => {
   const tiles = [];
@@ -21,9 +21,16 @@ const LudoBoard = () => {
 
   // 3. Yard Positions
   ['GREEN', 'YELLOW', 'BLUE', 'RED'].forEach(player => {
-    YARD_POSITIONS[player].forEach(([col, row], idx) => {
-      const rect = getCellRect(Math.floor(col), Math.floor(row));
-      tiles.push({ key: `yard_${player}_${idx}`, ...rect, label: `Y` });
+    YARD_POSITIONS[player].forEach((_, idx) => {
+      const pos = YARD_PIXEL_POSITIONS[player][idx];
+      tiles.push({
+        key: `yard_${player}_${idx}`,
+        left: pos.left - 3.3,
+        top: pos.top - 3.3,
+        width: 6.6,
+        height: 6.6,
+        label: `Y`
+      });
     });
   });
 

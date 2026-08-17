@@ -49,6 +49,33 @@ export const YARD_POSITIONS = {
   RED: [[1.5, 10.5], [3.5, 10.5], [1.5, 12.5], [3.5, 12.5]], // Bottom-Left (Fire Nation)
 };
 
+export const YARD_PIXEL_POSITIONS = {
+  GREEN: [
+    { left: 9.804, top: 7.852 },
+    { left: 22.913, top: 7.978 },
+    { left: 10.744, top: 22.650 },
+    { left: 22.719, top: 21.534 }
+  ],
+  YELLOW: [
+    { left: 71.415, top: 13.810 },
+    { left: 81.668, top: 13.810 },
+    { left: 71.415, top: 25.051 },
+    { left: 82.852, top: 25.051 }
+  ],
+  BLUE: [
+    { left: 67.783, top: 68.662 },
+    { left: 82.982, top: 66.167 },
+    { left: 66.437, top: 83.041 },
+    { left: 82.566, top: 84.520 }
+  ],
+  RED: [
+    { left: 9.333, top: 68.543 },
+    { left: 23.575, top: 66.497 },
+    { left: 11.801, top: 85.186 },
+    { left: 22.471, top: 84.295 }
+  ]
+};
+
 export const BASE_OFFSETS = {
   GREEN: 0,
   YELLOW: 13,

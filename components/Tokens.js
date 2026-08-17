@@ -9,7 +9,7 @@ import Animated, {
   Easing
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, LinearGradient, Stop, Ellipse } from 'react-native-svg';
-import { COLORS, GLOBAL_PATH, HOME_PATHS, YARD_POSITIONS, BASE_OFFSETS, getCellRect } from '../constants';
+import { COLORS, GLOBAL_PATH, HOME_PATHS, YARD_POSITIONS, YARD_PIXEL_POSITIONS, BASE_OFFSETS, getCellRect } from '../constants';
 import AirSvg from '../assets/air.svg';
 import WaterSvg from '../assets/water.svg';
 import FireSvg from '../assets/fire.svg';
@@ -67,16 +67,8 @@ const getTokenSymbol = (player, color = '#FFFFFF') => {
 
 const getTileCoords = (player, relativePosition, pieceIndex) => {
   if (relativePosition === -1) {
-    const [col, row] = YARD_POSITIONS[player][pieceIndex];
-    if (player === 'GREEN') {
-      return { left: (col / 6) * 39.55 - 3.3, top: (row / 6) * 40.55 - 3.3 };
-    } else if (player === 'YELLOW') {
-      return { left: 60.40 + ((col - 9) / 6) * 39.60 - 3.3, top: (row / 6) * 40.55 - 3.3 };
-    } else if (player === 'BLUE') {
-      return { left: 60.40 + ((col - 9) / 6) * 39.60 - 3.3, top: 60.47 + ((row - 9) / 6) * 39.53 - 3.3 };
-    } else {
-      return { left: (col / 6) * 39.55 - 3.3, top: 60.47 + ((row - 9) / 6) * 39.53 - 3.3 };
-    }
+    const pos = YARD_PIXEL_POSITIONS[player][pieceIndex];
+    return { left: pos.left - 3.3, top: pos.top - 3.3 };
   } else if (relativePosition >= 0 && relativePosition <= 50) {
     const globalPos = (BASE_OFFSETS[player] + relativePosition) % 52;
     const [col, row] = GLOBAL_PATH[globalPos];
