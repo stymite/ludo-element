@@ -9,7 +9,7 @@ import Animated, {
   Easing
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, LinearGradient, Stop, Ellipse } from 'react-native-svg';
-import { COLORS, GLOBAL_PATH, HOME_PATHS, YARD_POSITIONS, BASE_OFFSETS, CELL_SIZE } from '../constants';
+import { COLORS, GLOBAL_PATH, HOME_PATHS, YARD_POSITIONS, BASE_OFFSETS, getCellRect } from '../constants';
 import AirSvg from '../assets/air.svg';
 import WaterSvg from '../assets/water.svg';
 import FireSvg from '../assets/fire.svg';
@@ -65,24 +65,37 @@ const getTokenSymbol = (player, color = '#FFFFFF') => {
   }
 };
 
-const PADDING = 0.49;
-const GRID_SCALE = 99.02;
-const CELL_PCT = GRID_SCALE / 15; // 6.6013%
-
 const getTileCoords = (player, relativePosition, pieceIndex) => {
-  let col, row;
   if (relativePosition === -1) {
-    [col, row] = YARD_POSITIONS[player][pieceIndex];
+    const [col, row] = YARD_POSITIONS[player][pieceIndex];
+    if (player === 'GREEN') {
+      return { left: (col / 6) * 39.55 - 3.3, top: (row / 6) * 40.55 - 3.3 };
+    } else if (player === 'YELLOW') {
+      return { left: 60.40 + ((col - 9) / 6) * 39.60 - 3.3, top: (row / 6) * 40.55 - 3.3 };
+    } else if (player === 'BLUE') {
+      return { left: 60.40 + ((col - 9) / 6) * 39.60 - 3.3, top: 60.47 + ((row - 9) / 6) * 39.53 - 3.3 };
+    } else {
+      return { left: (col / 6) * 39.55 - 3.3, top: 60.47 + ((row - 9) / 6) * 39.53 - 3.3 };
+    }
   } else if (relativePosition >= 0 && relativePosition <= 50) {
     const globalPos = (BASE_OFFSETS[player] + relativePosition) % 52;
-    [col, row] = GLOBAL_PATH[globalPos];
+    const [col, row] = GLOBAL_PATH[globalPos];
+    const rect = getCellRect(col, row);
+    return { left: rect.left, top: rect.top };
   } else if (relativePosition >= 51 && relativePosition <= 55) {
-    [col, row] = HOME_PATHS[player][relativePosition - 51];
+    const [col, row] = HOME_PATHS[player][relativePosition - 51];
+    const rect = getCellRect(col, row);
+    return { left: rect.left, top: rect.top };
   } else if (relativePosition === 56) {
-    const offsets = { GREEN: [6.5, 7], YELLOW: [7, 6.5], BLUE: [7.5, 7], RED: [7, 7.5] };
-    [col, row] = offsets[player];
+    const centerOffsets = {
+      GREEN: { left: 43.0, top: 47.19 },
+      YELLOW: { left: 46.5, top: 43.8 },
+      BLUE: { left: 50.0, top: 47.19 },
+      RED: { left: 46.5, top: 50.5 },
+    };
+    return centerOffsets[player];
   }
-  return { col, row };
+  return { left: 0, top: 0 };
 };
 
 const getSymbolOffsetStyle = (player) => {
@@ -158,8 +171,8 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
   const pieceIndex = parseInt(piece.id.split('_')[1]);
   const currentCoords = getTileCoords(piece.player, piece.relativePosition, pieceIndex);
 
-  const left = useSharedValue(currentCoords.col * CELL_PCT);
-  const top = useSharedValue(currentCoords.row * CELL_PCT);
+  const left = useSharedValue(currentCoords.left);
+  const top = useSharedValue(currentCoords.top);
   const scale = useSharedValue(1);
   const pulse = useSharedValue(1);
   const prevPosition = useRef(piece.relativePosition);
@@ -183,8 +196,8 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
 
       if (newPos === -1) {
         const target = getTileCoords(piece.player, -1, pieceIndex);
-        left.value = withTiming(target.col * CELL_PCT, { duration: 400 });
-        top.value = withTiming(target.row * CELL_PCT, { duration: 400 });
+        left.value = withTiming(target.left, { duration: 400 });
+        top.value = withTiming(target.top, { duration: 400 });
       } else {
         let steps = [];
         let start = oldPos === -1 ? 0 : oldPos + 1;
@@ -192,8 +205,8 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
         for (let pos = start; pos <= newPos; pos++) {
           const coords = getTileCoords(piece.player, pos, pieceIndex);
           steps.push({
-            left: coords.col * CELL_PCT,
-            top: coords.row * CELL_PCT
+            left: coords.left,
+            top: coords.top
           });
         }
 
@@ -216,8 +229,8 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      left: `${PADDING + left.value}%`,
-      top: `${PADDING + top.value}%`,
+      left: `${left.value}%`,
+      top: `${top.value}%`,
       transform: [
         { scale: scale.value },
         { scale: pulse.value },
@@ -260,8 +273,8 @@ const Tokens = ({ pieces, eligiblePieces, onPiecePress }) => {
   pieces.forEach(piece => {
     if (piece.relativePosition === -1 || piece.relativePosition === 56) return;
     const pieceIndex = parseInt(piece.id.split('_')[1]);
-    const { col, row } = getTileCoords(piece.player, piece.relativePosition, pieceIndex);
-    const key = `${col},${row}`;
+    const { left, top } = getTileCoords(piece.player, piece.relativePosition, pieceIndex);
+    const key = `${left.toFixed(1)},${top.toFixed(1)}`;
     if (!tileGroups[key]) tileGroups[key] = [];
     tileGroups[key].push(piece.id);
   });
@@ -274,8 +287,8 @@ const Tokens = ({ pieces, eligiblePieces, onPiecePress }) => {
         let stackOffset = { dx: 0, dy: 0 };
         if (piece.relativePosition >= 0 && piece.relativePosition < 56) {
           const pieceIndex = parseInt(piece.id.split('_')[1]);
-          const { col, row } = getTileCoords(piece.player, piece.relativePosition, pieceIndex);
-          const key = `${col},${row}`;
+          const { left, top } = getTileCoords(piece.player, piece.relativePosition, pieceIndex);
+          const key = `${left.toFixed(1)},${top.toFixed(1)}`;
           const group = tileGroups[key];
 
           if (group && group.length > 1) {
@@ -305,8 +318,8 @@ const Tokens = ({ pieces, eligiblePieces, onPiecePress }) => {
 const styles = StyleSheet.create({
   tokenContainer: {
     position: 'absolute',
-    width: `${CELL_PCT}%`,
-    height: `${CELL_PCT}%`,
+    width: '6.6%',
+    height: '6.6%',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,

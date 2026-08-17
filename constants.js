@@ -58,25 +58,48 @@ export const BASE_OFFSETS = {
 
 export const SAFE_TILES = new Set([0, 8, 13, 21, 26, 34, 39, 47]);
 
-// Helper to get [x, y] coordinates for a token given its player and relative position
-export const getPixelCoordinates = (player, relativePosition) => {
-  let col, row;
-
-  if (relativePosition === -1) {
-    return [0, 0];
-  } else if (relativePosition >= 0 && relativePosition <= 50) {
-    const globalPos = (BASE_OFFSETS[player] + relativePosition) % 52;
-    [col, row] = GLOBAL_PATH[globalPos];
-  } else if (relativePosition >= 51 && relativePosition <= 55) {
-    [col, row] = HOME_PATHS[player][relativePosition - 51];
-  } else if (relativePosition === 56) {
-    if (player === 'GREEN') return [6.5 * CELL_SIZE, 7 * CELL_SIZE];
-    if (player === 'YELLOW') return [7 * CELL_SIZE, 6.5 * CELL_SIZE];
-    if (player === 'BLUE') return [7.5 * CELL_SIZE, 7 * CELL_SIZE];
-    if (player === 'RED') return [7 * CELL_SIZE, 7.5 * CELL_SIZE];
+// Exact 15x15 board geometry measured directly from latest.jpg image pixels
+export const getColBounds = (col) => {
+  if (col < 6) {
+    const w = 39.55 / 6;
+    return { left: col * w, width: w };
+  } else if (col < 9) {
+    const w = (60.40 - 39.55) / 3;
+    return { left: 39.55 + (col - 6) * w, width: w };
   } else {
-    [col, row] = [0, 0];
+    const w = (100 - 60.40) / 6;
+    return { left: 60.40 + (col - 9) * w, width: w };
   }
+};
 
-  return [col * CELL_SIZE, row * CELL_SIZE];
+export const getRowBounds = (row) => {
+  if (row < 6) {
+    const h = 40.55 / 6;
+    return { top: row * h, height: h };
+  } else if (row < 9) {
+    const h = (60.47 - 40.55) / 3;
+    return { top: 40.55 + (row - 6) * h, height: h };
+  } else {
+    const h = (100 - 60.47) / 6;
+    return { top: 60.47 + (row - 9) * h, height: h };
+  }
+};
+
+export const getCellRect = (col, row) => {
+  const colB = getColBounds(col);
+  const rowB = getRowBounds(row);
+  return {
+    left: colB.left,
+    top: rowB.top,
+    width: colB.width,
+    height: rowB.height,
+  };
+};
+
+export const getCellCenter = (col, row) => {
+  const rect = getCellRect(col, row);
+  return {
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+  };
 };
