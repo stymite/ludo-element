@@ -8,32 +8,53 @@ import Animated, {
   withRepeat,
   Easing
 } from 'react-native-reanimated';
+import Svg, { Circle, Defs, LinearGradient, Stop, Ellipse } from 'react-native-svg';
 import { COLORS, GLOBAL_PATH, HOME_PATHS, YARD_POSITIONS, BASE_OFFSETS, CELL_SIZE } from '../constants';
 import AirSvg from '../assets/air.svg';
 import WaterSvg from '../assets/water.svg';
 import FireSvg from '../assets/fire.svg';
 import EarthSvg from '../assets/earth.svg';
 
-const SHINY_THEMES = {
+const COIN_THEMES = {
   RED: {
-    color: '#FF4D4D',       // Lighter, luminous ruby
-    topGleam: '#FFA3A3',    // Specular top highlight
+    rimTop: '#FFA4A4',
+    rimMid: '#FF2A42',
+    rimBot: '#7A0010',
+    innerTop: '#E52538',
+    innerBot: '#5C0008',
+    glow: '#FF2A42',
+    symbolColor: '#FFFFFF',
   },
   GREEN: {
-    color: '#34D399',       // Lighter, radiant emerald
-    topGleam: '#A7F3D0',    // Specular top highlight
+    rimTop: '#B9F6CA',
+    rimMid: '#00D060',
+    rimBot: '#004818',
+    innerTop: '#00A344',
+    innerBot: '#003810',
+    glow: '#00D060',
+    symbolColor: '#FFFFFF',
   },
   YELLOW: {
-    color: '#FBBF24',       // Lighter, sparkling gold
-    topGleam: '#FDE68A',    // Specular top highlight
+    rimTop: '#FFF59D',
+    rimMid: '#FFB300',
+    rimBot: '#7C3F00',
+    innerTop: '#FFA000',
+    innerBot: '#5E2A00',
+    glow: '#FFB300',
+    symbolColor: '#FFFFFF',
   },
   BLUE: {
-    color: '#38BDF8',       // Lighter, brilliant electric sky-blue
-    topGleam: '#BAE6FD',    // Specular top highlight
+    rimTop: '#80D8FF',
+    rimMid: '#0099FF',
+    rimBot: '#003380',
+    innerTop: '#0077E6',
+    innerBot: '#002566',
+    glow: '#0099FF',
+    symbolColor: '#FFFFFF',
   }
 };
 
-const getTokenSymbol = (player, color) => {
+const getTokenSymbol = (player, color = '#FFFFFF') => {
   const size = "100%";
   switch (player) {
     case 'RED': return <FireSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
@@ -44,7 +65,9 @@ const getTokenSymbol = (player, color) => {
   }
 };
 
-const CELL_PCT = 100 / 15; // 6.666%
+const PADDING = 0.49;
+const GRID_SCALE = 99.02;
+const CELL_PCT = GRID_SCALE / 15; // 6.6013%
 
 const getTileCoords = (player, relativePosition, pieceIndex) => {
   let col, row;
@@ -56,10 +79,79 @@ const getTileCoords = (player, relativePosition, pieceIndex) => {
   } else if (relativePosition >= 51 && relativePosition <= 55) {
     [col, row] = HOME_PATHS[player][relativePosition - 51];
   } else if (relativePosition === 56) {
-    const offsets = { RED: [6.5, 7], GREEN: [7, 6.5], YELLOW: [7.5, 7], BLUE: [7, 7.5] };
+    const offsets = { GREEN: [6.5, 7], YELLOW: [7, 6.5], BLUE: [7.5, 7], RED: [7, 7.5] };
     [col, row] = offsets[player];
   }
   return { col, row };
+};
+
+const getSymbolOffsetStyle = (player) => {
+  switch (player) {
+    case 'YELLOW': // AIR: little bit right, little bit down (halved)
+      return { transform: [{ translateX: 0.75 }, { translateY: 0.75 }] };
+    case 'GREEN': // EARTH: little bit above (up) and right (halved, nudged left)
+      return { transform: [{ translateX: 0.2 }, { translateY: -1.0 }] };
+    case 'RED': // FIRE: little bit right (nudged left)
+      return { transform: [{ translateX: 0.4 }] };
+    case 'BLUE': // WATER: tiny bit right (halved)
+      return { transform: [{ translateX: 0.5 }] };
+    default:
+      return {};
+  }
+};
+
+const CoinMedallion = ({ player }) => {
+  const theme = COIN_THEMES[player] || COIN_THEMES.RED;
+  const rimGradId = `rim_${player}`;
+  const innerGradId = `inner_${player}`;
+  const glossGradId = `gloss_${player}`;
+
+  return (
+    <View style={styles.coinWrapper}>
+      <Svg width="100%" height="100%" viewBox="0 0 100 100">
+        <Defs>
+          {/* Metallic Rim Gradient */}
+          <LinearGradient id={rimGradId} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%" stopColor={theme.rimTop} />
+            <Stop offset="35%" stopColor={theme.rimMid} />
+            <Stop offset="100%" stopColor={theme.rimBot} />
+          </LinearGradient>
+
+          {/* Inner Glossy Glass Disc Gradient */}
+          <LinearGradient id={innerGradId} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%" stopColor={theme.innerTop} />
+            <Stop offset="100%" stopColor={theme.innerBot} />
+          </LinearGradient>
+
+          {/* Top Glass Specular Arc Reflection */}
+          <LinearGradient id={glossGradId} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.65" />
+            <Stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          </LinearGradient>
+        </Defs>
+
+        {/* Outer Metallic Bezel */}
+        <Circle cx="50" cy="50" r="48" fill={`url(#${rimGradId})`} />
+
+        {/* Specular Edge Highlight */}
+        <Circle cx="50" cy="50" r="47.5" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="1" />
+
+        {/* Inner Groove Drop Shadow */}
+        <Circle cx="50" cy="50" r="38" fill="rgba(0,0,0,0.4)" />
+
+        {/* Inner Colored Glass Disc */}
+        <Circle cx="50" cy="50" r="36.5" fill={`url(#${innerGradId})`} />
+
+        {/* Top Gloss Arc Sheen */}
+        <Ellipse cx="50" cy="27" rx="27" ry="14" fill={`url(#${glossGradId})`} />
+      </Svg>
+
+      {/* Center White Element Emblem */}
+      <View style={[styles.symbolOverlay, getSymbolOffsetStyle(player)]}>
+        {getTokenSymbol(player, theme.symbolColor)}
+      </View>
+    </View>
+  );
 };
 
 const Token = ({ piece, eligible, onPress, stackOffset }) => {
@@ -124,8 +216,8 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      left: `${left.value}%`,
-      top: `${top.value}%`,
+      left: `${PADDING + left.value}%`,
+      top: `${PADDING + top.value}%`,
       transform: [
         { scale: scale.value },
         { scale: pulse.value },
@@ -135,7 +227,7 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
     };
   });
 
-  const theme = SHINY_THEMES[piece.player] || { color: COLORS[piece.player], topGleam: '#FFFFFF' };
+  const theme = COIN_THEMES[piece.player] || COIN_THEMES.RED;
 
   return (
     <Animated.View style={[styles.tokenContainer, animatedStyle]}>
@@ -145,20 +237,18 @@ const Token = ({ piece, eligible, onPress, stackOffset }) => {
         onPress={() => onPress(piece.id)}
         style={styles.tokenTouchable}
       >
-        {eligible && <View style={styles.glowRing} />}
-        <View style={[
-          styles.tokenDisc,
-          {
-            borderColor: theme.color,
-            borderTopColor: theme.topGleam,
-            borderLeftColor: theme.topGleam,
-            shadowColor: theme.color,
-          }
-        ]}>
-          <View style={styles.symbolContainer}>
-            {getTokenSymbol(piece.player, theme.color)}
-          </View>
-        </View>
+        {eligible && (
+          <View
+            style={[
+              styles.glowRing,
+              {
+                borderColor: theme.glow,
+                shadowColor: theme.glow,
+              }
+            ]}
+          />
+        )}
+        <CoinMedallion player={piece.player} />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -215,8 +305,8 @@ const Tokens = ({ pieces, eligiblePieces, onPiecePress }) => {
 const styles = StyleSheet.create({
   tokenContainer: {
     position: 'absolute',
-    width: `${100 / 15}%`,
-    height: `${100 / 15}%`,
+    width: `${CELL_PCT}%`,
+    height: `${CELL_PCT}%`,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
@@ -226,40 +316,39 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 9999,
   },
   glowRing: {
     position: 'absolute',
-    width: '116%',
+    width: '118%',
     aspectRatio: 1,
     borderRadius: 9999,
-    backgroundColor: 'rgba(34, 197, 94, 0.35)',
-    borderWidth: 2.5,
-    borderColor: '#22C55E',
-    shadowColor: '#22C55E',
+    borderWidth: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.9,
+    shadowOpacity: 1,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 5,
   },
-  tokenDisc: {
+  coinWrapper: {
     width: '94%',
     aspectRatio: 1,
     borderRadius: 9999,
-    backgroundColor: '#F8F9FA', // Clean off-white surface
-    borderWidth: 2.8, // Crisp shiny outline
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.35,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowRadius: 3.5,
+    elevation: 6,
   },
-  symbolContainer: {
-    width: '78%',
-    aspectRatio: 1,
+  symbolOverlay: {
+    position: 'absolute',
+    width: '54%',
+    height: '54%',
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
+    borderRadius: 9999,
   }
 });
 

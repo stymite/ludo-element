@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import BoardSvg from '../assets/Ludo Board Game Illustration.svg';
+import { View, Image, StyleSheet } from 'react-native';
 
 const LudoBoard = () => {
   return (
     <View style={styles.container}>
-      <BoardSvg width="100%" height="100%" />
+      <Image
+        source={require('../assets/latest.jpg')}
+        style={styles.boardImage}
+        resizeMode="contain"
+      />
     </View>
   );
 };
@@ -17,6 +20,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
+  },
+  boardImage: {
+    width: '100%',
+    height: '100%',
   }
 });
 

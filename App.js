@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, SafeAreaView, Dimensions, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, SafeAreaView, useWindowDimensions, TouchableOpacity, Text, Image } from 'react-native';
 import { createGame, rollDice, getLegalMoves, movePiece } from './engine';
 import LudoBoard from './components/LudoBoard';
 import Tokens from './components/Tokens';
 import Dice from './components/Dice';
 import { WinnerModal, MenuModal } from './components/Modals';
-import { Image } from 'react-native';
 import { getBestBotMove } from './botEngine';
 import HomeMenu from './components/HomeMenu';
 
@@ -17,19 +16,21 @@ export default function App() {
   const [eligiblePieces, setEligiblePieces] = useState([]);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
 
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+  const boardSize = Math.max(260, Math.min(width - 24, height - (isLandscape ? 140 : 210), 540));
+
   // Update eligible pieces whenever state changes
   useEffect(() => {
     if (gameState.turnPhase === 'WAITING_FOR_MOVE') {
       const moves = getLegalMoves(gameState);
       setEligiblePieces(moves.map(p => p.id));
       
-      // Auto-move if only 1 legal move (per the engine implementation plan)
-      // Only auto-move for human players here, bot logic handles its own moves
       const isBot = gameState.players[gameState.activePlayer]?.isBot;
       if (moves.length === 1 && !isBot) {
         setTimeout(() => {
           handlePiecePress(moves[0].id);
-        }, 500); // Small delay for UX
+        }, 500);
       }
     } else {
       setEligiblePieces([]);
@@ -64,18 +65,15 @@ export default function App() {
   const handleRollDice = () => {
     if (gameState.turnPhase !== 'WAITING_FOR_ROLL' || gameState.gameOver) return;
     
-    // Engine modifies state in place, but React needs a new reference for re-render
     const nextState = rollDice({ ...gameState });
-    // Deep copy pieces and players so React notices changes
     nextState.pieces = [...nextState.pieces.map(p => ({...p}))];
     nextState.players = JSON.parse(JSON.stringify(nextState.players));
     setGameState(nextState);
   };
 
   const handlePiecePress = (pieceId) => {
-    if (gameState.turnPhase !== 'WAITING_FOR_MOVE') return;
+    if (gameState.turnPhase !== 'WAITING_FOR_MOVE' || gameState.gameOver) return;
     
-    // Check if the piece is actually a legal move right now
     const legalMoves = getLegalMoves(gameState);
     if (!legalMoves.some(p => p.id === pieceId)) return;
     
@@ -87,7 +85,7 @@ export default function App() {
 
   const handleNewGame = () => {
     if (gameMode === 'VS_COMPUTER') {
-      setGameState(createGame(4, ['GREEN', 'YELLOW', 'BLUE']));
+      setGameState(createGame(4, ['YELLOW', 'BLUE', 'RED']));
     } else {
       setGameState(createGame(4));
     }
@@ -129,7 +127,7 @@ export default function App() {
         }}
         onPlayComputer={() => {
           setGameMode('VS_COMPUTER');
-          setGameState(createGame(4, ['GREEN', 'YELLOW', 'BLUE']));
+          setGameState(createGame(4, ['YELLOW', 'BLUE', 'RED']));
           setAppState('GAME');
         }}
       />
@@ -149,22 +147,22 @@ export default function App() {
 
       <View style={styles.gameArea}>
         {/* Top Row Dice */}
-        <View style={styles.diceRow}>
-          <Dice 
-            value={gameState.diceValue}
-            isActive={gameState.activePlayer === 'RED'}
-            onRoll={handleRollDice}
-            disabled={gameState.turnPhase !== 'WAITING_FOR_ROLL' || gameState.gameOver || gameState.activePlayer !== 'RED' || gameState.players['RED']?.isBot}
-          />
+        <View style={[styles.diceRow, { width: boardSize }]}>
           <Dice 
             value={gameState.diceValue}
             isActive={gameState.activePlayer === 'GREEN'}
             onRoll={handleRollDice}
             disabled={gameState.turnPhase !== 'WAITING_FOR_ROLL' || gameState.gameOver || gameState.activePlayer !== 'GREEN' || gameState.players['GREEN']?.isBot}
           />
+          <Dice 
+            value={gameState.diceValue}
+            isActive={gameState.activePlayer === 'YELLOW'}
+            onRoll={handleRollDice}
+            disabled={gameState.turnPhase !== 'WAITING_FOR_ROLL' || gameState.gameOver || gameState.activePlayer !== 'YELLOW' || gameState.players['YELLOW']?.isBot}
+          />
         </View>
 
-        <View style={styles.boardContainer}>
+        <View style={[styles.boardContainer, { width: boardSize, height: boardSize }]}>
           <LudoBoard />
           <Tokens 
             pieces={gameState.pieces} 
@@ -176,18 +174,18 @@ export default function App() {
         </View>
 
         {/* Bottom Row Dice */}
-        <View style={styles.diceRow}>
+        <View style={[styles.diceRow, { width: boardSize }]}>
+          <Dice 
+            value={gameState.diceValue}
+            isActive={gameState.activePlayer === 'RED'}
+            onRoll={handleRollDice}
+            disabled={gameState.turnPhase !== 'WAITING_FOR_ROLL' || gameState.gameOver || gameState.activePlayer !== 'RED' || gameState.players['RED']?.isBot}
+          />
           <Dice 
             value={gameState.diceValue}
             isActive={gameState.activePlayer === 'BLUE'}
             onRoll={handleRollDice}
             disabled={gameState.turnPhase !== 'WAITING_FOR_ROLL' || gameState.gameOver || gameState.activePlayer !== 'BLUE' || gameState.players['BLUE']?.isBot}
-          />
-          <Dice 
-            value={gameState.diceValue}
-            isActive={gameState.activePlayer === 'YELLOW'}
-            onRoll={handleRollDice}
-            disabled={gameState.turnPhase !== 'WAITING_FOR_ROLL' || gameState.gameOver || gameState.activePlayer !== 'YELLOW' || gameState.players['YELLOW']?.isBot}
           />
         </View>
       </View>
@@ -212,8 +210,6 @@ export default function App() {
   );
 }
 
-const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -224,10 +220,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 12,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '900',
     letterSpacing: 2,
     color: '#212121',
@@ -267,23 +263,23 @@ const styles = StyleSheet.create({
   gameArea: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 10,
   },
   diceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginVertical: 10,
+    marginVertical: 6,
   },
   boardContainer: {
-    width: width - 20,
-    height: width - 20, // 1:1 aspect ratio with padding
     alignSelf: 'center',
     position: 'relative',
+    borderRadius: 12,
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
   }
 });

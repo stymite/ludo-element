@@ -1,5 +1,5 @@
-const PLAYERS = ['RED', 'GREEN', 'YELLOW', 'BLUE'];
-const BASE_OFFSETS = { RED: 0, GREEN: 13, YELLOW: 26, BLUE: 39 };
+const PLAYERS = ['GREEN', 'YELLOW', 'BLUE', 'RED'];
+const BASE_OFFSETS = { GREEN: 0, YELLOW: 13, BLUE: 26, RED: 39 };
 const SAFE_TILES = new Set([0, 8, 13, 21, 26, 34, 39, 47]);
 
 function createGame(numPlayers = 4, bots = []) {
