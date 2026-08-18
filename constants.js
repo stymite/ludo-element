@@ -51,28 +51,28 @@ export const YARD_POSITIONS = {
 
 export const YARD_PIXEL_POSITIONS = {
   GREEN: [
-    { left: 9.804, top: 7.852 },
-    { left: 22.913, top: 7.978 },
-    { left: 10.744, top: 22.650 },
-    { left: 22.719, top: 21.534 }
+    { left: 12.363, top: 11.888 },
+    { left: 25.275, top: 12.122 },
+    { left: 12.215, top: 25.140 },
+    { left: 24.845, top: 25.197 }
   ],
   YELLOW: [
-    { left: 71.415, top: 13.810 },
-    { left: 81.668, top: 13.810 },
-    { left: 71.415, top: 25.051 },
-    { left: 82.852, top: 25.051 }
+    { left: 70.665, top: 13.810 },
+    { left: 82.659, top: 14.367 },
+    { left: 70.666, top: 25.826 },
+    { left: 82.982, top: 26.090 }
   ],
   BLUE: [
-    { left: 67.783, top: 68.662 },
-    { left: 82.982, top: 66.167 },
-    { left: 66.437, top: 83.041 },
-    { left: 82.566, top: 84.520 }
+    { left: 67.094, top: 67.227 },
+    { left: 82.985, top: 66.732 },
+    { left: 67.252, top: 85.881 },
+    { left: 83.984, top: 84.961 }
   ],
   RED: [
-    { left: 9.333, top: 68.543 },
-    { left: 23.575, top: 66.497 },
-    { left: 11.801, top: 85.186 },
-    { left: 22.471, top: 84.295 }
+    { left: 12.207, top: 65.308 },
+    { left: 24.902, top: 65.308 },
+    { left: 11.475, top: 85.938 },
+    { left: 25.635, top: 85.449 }
   ]
 };
 
