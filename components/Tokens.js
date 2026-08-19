@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -54,14 +54,19 @@ const COIN_THEMES = {
   }
 };
 
-const getTokenSymbol = (player, color = '#FFFFFF') => {
+const getTokenSymbol = (player) => {
   const size = "100%";
   switch (player) {
-    case 'RED': return <FireSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
-    case 'BLUE': return <WaterSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
-    case 'GREEN': return <EarthSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
-    case 'YELLOW': return <AirSvg width={size} height={size} color={color} fill={color} preserveAspectRatio="xMidYMid meet" />;
-    default: return null;
+    case 'RED':
+      return <Image source={require('../assets/red.png')} style={{ width: size, height: size }} resizeMode="contain" />;
+    case 'YELLOW':
+      return <Image source={require('../assets/yellow.png')} style={{ width: size, height: size }} resizeMode="contain" />;
+    case 'BLUE':
+      return <Image source={require('../assets/blue.png')} style={{ width: size, height: size }} resizeMode="contain" />;
+    case 'GREEN':
+      return <Image source={require('../assets/green.png')} style={{ width: size, height: size }} resizeMode="contain" />;
+    default:
+      return null;
   }
 };
 
@@ -92,8 +97,8 @@ const getTileCoords = (player, relativePosition, pieceIndex) => {
 
 const getSymbolOffsetStyle = (player) => {
   switch (player) {
-    case 'YELLOW': // AIR: little bit right, little bit down (halved)
-      return { transform: [{ translateX: 0.75 }, { translateY: 0.75 }] };
+    case 'YELLOW': // AIR: shifted left by 1.25px
+      return { transform: [{ translateX: -0.5 }, { translateY: 0.75 }] };
     case 'GREEN': // EARTH: little bit above (up) and right (halved, nudged left)
       return { transform: [{ translateX: 0.2 }, { translateY: -1.0 }] };
     case 'RED': // FIRE: little bit right (nudged left)

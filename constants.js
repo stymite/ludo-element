@@ -51,28 +51,28 @@ export const YARD_POSITIONS = {
 
 export const YARD_PIXEL_POSITIONS = {
   GREEN: [
-    { left: 14.775, top: 15.275 },
-    { left: 24.775, top: 15.275 },
-    { left: 14.775, top: 25.275 },
-    { left: 24.775, top: 25.275 }
+    { left: 14.55, top: 15.90 },
+    { left: 24.55, top: 15.90 },
+    { left: 14.55, top: 25.90 },
+    { left: 24.55, top: 25.90 }
   ],
   YELLOW: [
-    { left: 75.200, top: 15.275 },
-    { left: 85.200, top: 15.275 },
-    { left: 75.200, top: 25.275 },
-    { left: 85.200, top: 25.275 }
+    { left: 75.45, top: 15.90 },
+    { left: 85.45, top: 15.90 },
+    { left: 75.45, top: 25.90 },
+    { left: 85.45, top: 25.90 }
   ],
   BLUE: [
-    { left: 75.200, top: 75.235 },
-    { left: 85.200, top: 75.235 },
-    { left: 75.200, top: 85.235 },
-    { left: 85.200, top: 85.235 }
+    { left: 75.45, top: 75.30 },
+    { left: 85.45, top: 75.30 },
+    { left: 75.45, top: 85.30 },
+    { left: 85.45, top: 85.30 }
   ],
   RED: [
-    { left: 14.775, top: 75.235 },
-    { left: 24.775, top: 75.235 },
-    { left: 14.775, top: 85.235 },
-    { left: 24.775, top: 85.235 }
+    { left: 14.55, top: 75.30 },
+    { left: 24.55, top: 75.30 },
+    { left: 14.55, top: 85.30 },
+    { left: 24.55, top: 85.30 }
   ]
 };
 
@@ -85,17 +85,17 @@ export const BASE_OFFSETS = {
 
 export const SAFE_TILES = new Set([0, 8, 13, 21, 26, 34, 39, 47]);
 
-// Exact 15x15 board geometry measured directly from latest.jpg image pixels
+// Exact 15x15 board geometry measured directly from updated.jpg image pixels
 export const getColBounds = (col) => {
   if (col < 6) {
-    const w = 39.55 / 6;
+    const w = 39.60 / 6;
     return { left: col * w, width: w };
   } else if (col < 9) {
-    const w = (60.40 - 39.55) / 3;
-    return { left: 39.55 + (col - 6) * w, width: w };
+    const w = (60.60 - 39.60) / 3;
+    return { left: 39.60 + (col - 6) * w, width: w };
   } else {
-    const w = (100 - 60.40) / 6;
-    return { left: 60.40 + (col - 9) * w, width: w };
+    const w = (100 - 60.60) / 6;
+    return { left: 60.60 + (col - 9) * w, width: w };
   }
 };
 
@@ -104,11 +104,11 @@ export const getRowBounds = (row) => {
     const h = 40.55 / 6;
     return { top: row * h, height: h };
   } else if (row < 9) {
-    const h = (60.47 - 40.55) / 3;
+    const h = (60.45 - 40.55) / 3;
     return { top: 40.55 + (row - 6) * h, height: h };
   } else {
-    const h = (100 - 60.47) / 6;
-    return { top: 60.47 + (row - 9) * h, height: h };
+    const h = (100 - 60.45) / 6;
+    return { top: 60.45 + (row - 9) * h, height: h };
   }
 };
 

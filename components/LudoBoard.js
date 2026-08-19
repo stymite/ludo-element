@@ -37,9 +37,54 @@ const LudoBoard = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../assets/latest.jpg')}
+        source={require('../assets/updated.jpg')}
         style={styles.boardImage}
         resizeMode="contain"
+      />
+      {/* 4 Base Palace Cover Placeholders (Exact fit covering full inner palace box and borders) */}
+      <View
+        style={{
+          position: 'absolute',
+          left: '5.4%',
+          top: '6.6%',
+          width: '28.3%',
+          height: '28.6%',
+          backgroundColor: '#000000',
+          borderRadius: 18,
+        }}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          left: '66.3%',
+          top: '6.6%',
+          width: '28.3%',
+          height: '28.6%',
+          backgroundColor: '#000000',
+          borderRadius: 18,
+        }}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          left: '66.3%',
+          top: '66.0%',
+          width: '28.3%',
+          height: '28.6%',
+          backgroundColor: '#000000',
+          borderRadius: 18,
+        }}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          left: '5.4%',
+          top: '66.0%',
+          width: '28.3%',
+          height: '28.6%',
+          backgroundColor: '#000000',
+          borderRadius: 18,
+        }}
       />
       {/* Temporary Debug Path Overlay */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
