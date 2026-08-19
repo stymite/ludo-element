@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 812" fill="none">
+  <!-- Solid deep dark background matching the App.js home background -->
+  <rect width="375" height="812" fill="#07070E"/>
+  <!-- Some decorative glowing circles for design depth -->
+  <circle cx="187.5" cy="200" r="150" fill="#1E88E5" opacity="0.15"/>
+  <circle cx="187.5" cy="600" r="200" fill="#E53935" opacity="0.1"/>
+  <!-- Title text in SVG for clean look -->
+  <text x="50%" y="30%" dominant-baseline="middle" text-anchor="middle" fill="#FFFFFF" font-size="48" font-family="sans-serif" font-weight="900" letter-spacing="4">LUDO</text>
+  <text x="50%" y="36%" dominant-baseline="middle" text-anchor="middle" fill="#BDBDBD" font-size="16" font-family="sans-serif" font-weight="bold">CHAMPIONSHIP</text>
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2200 800" width="100%" height="100%">
+  <!-- RED Token (viewBox: 10 135 600 600) -->
+  <g transform="translate(160, 297.5) scale(12.5)">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5" />
+    <circle cx="12" cy="9" r="4.5" fill="#E53935" />
+    <circle cx="12" cy="9" r="4.5" fill="none" stroke="#1A1A1A" stroke-width="1" />
+  </g>
+
+  <!-- GREEN Token (viewBox: 500 135 600 600) -->
+  <g transform="translate(650, 297.5) scale(12.5)">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5" />
+    <circle cx="12" cy="9" r="4.5" fill="#43A047" />
+    <circle cx="12" cy="9" r="4.5" fill="none" stroke="#1A1A1A" stroke-width="1" />
+  </g>
+
+  <!-- YELLOW Token (viewBox: 1000 135 600 600) -->
+  <g transform="translate(1150, 297.5) scale(12.5)">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5" />
+    <circle cx="12" cy="9" r="4.5" fill="#FDD835" />
+    <circle cx="12" cy="9" r="4.5" fill="none" stroke="#1A1A1A" stroke-width="1" />
+  </g>
+
+  <!-- BLUE Token (viewBox: 1572 135 600 600) -->
+  <g transform="translate(1722, 297.5) scale(12.5)">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5" />
+    <circle cx="12" cy="9" r="4.5" fill="#1E88E5" />
+    <circle cx="12" cy="9" r="4.5" fill="none" stroke="#1A1A1A" stroke-width="1" />
+  </g>
+</svg>
